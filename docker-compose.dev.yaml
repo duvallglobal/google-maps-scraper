@@ -8,7 +8,7 @@ services:
       - '127.0.0.1:5432:5432'
     expose:
       - 5432
-    volumes: 
+    volumes:
       - gmapsdev:/var/lib/postgresql/data
     restart: "unless-stopped"
     healthcheck:
@@ -20,12 +20,29 @@ services:
     image: migrate/migrate
     volumes:
       - ./scripts/migrations:/migrations
-    command: ["-path", "/migrations", "-database",  "postgres://postgres:postgres@db:5432/postgres?sslmode=disable", "up"]
+    command: ["-path", "/migrations", "-database", "postgres://postgres:postgres@db:5432/postgres?sslmode=disable", "up"]
     healthcheck:
-      test: "exit 0"
+      test: ["CMD", "true"]
+      interval: 2s
+      timeout: 30s
+      retries: 5
     depends_on:
       db:
         condition: service_healthy
-
+  scraper:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["-api"]
+    environment:
+      - POSTGRES_URL=postgres://postgres:postgres@db:5432/postgres?sslmode=disable
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    restart: "unless-stopped"
 volumes:
   gmapsdev:
