@@ -24,9 +24,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["-api"]
-    environment:
-      - POSTGRES_URL=postgres://postgres:postgres@db:5432/postgres?sslmode=disable
+    command: ["-web", "-dsn", "postgres://postgres:postgres@db:5432/postgres?sslmode=disable"]
     ports:
       - "8080:8080"
     depends_on:
