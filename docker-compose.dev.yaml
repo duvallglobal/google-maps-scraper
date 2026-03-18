@@ -17,11 +17,6 @@ services:
     volumes:
       - ./scripts/migrations:/migrations
     command: ["-path", "/migrations", "-database", "postgres://postgres:postgres@db:5432/postgres?sslmode=disable", "up"]
-    healthcheck:
-      test: ["CMD", "true"]
-      interval: 2s
-      timeout: 30s
-      retries: 5
     depends_on:
       db:
         condition: service_healthy
